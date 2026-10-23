@@ -1,0 +1,10 @@
+# extract text data
+*.txt
+!requirements.txt
+
+# environment
+website_env/
+
+# api key
+.env
+
