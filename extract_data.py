@@ -1,11 +1,10 @@
+import os
+from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import requests
 
-# Target website URL
-url = "https://en.wikipedia.org/wiki/Artificial_intelligence"
-
-# Add headers to mimic a real browser and bypass 403 Forbidden error
-headers = {
+# Set headers to mimic a real browser request and avoid 403 Forbidden errors
+HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -14,38 +13,50 @@ headers = {
 }
 
 
-def scrape_website_data(target_url):
+def scrape_and_save(target_url):
+  """Scrapes text content from a given URL and saves it as a .txt file
+
+  inside the uploads directory using the domain name.
+  """
   try:
-    # Send an HTTP GET request with headers
-    response = requests.get(target_url, headers=headers)
+    # Send HTTP GET request to target URL
+    response = requests.get(target_url, headers=HEADERS, timeout=10)
+    if response.status_code != 200:
+      return {
+          "success": False,
+          "error": f"Failed to fetch URL. Status code: {response.status_code}",
+      }
 
-    # Check if the request was successful
-    if response.status_code == 200:
-      # Parse the HTML content using BeautifulSoup
-      soup = BeautifulSoup(response.text, "html.parser")
+    # Parse HTML response
+    soup = BeautifulSoup(response.text, "html.parser")
 
-      # Extract text from key structural elements (headings, paragraphs, lists)
-      extracted_texts = []
-      for element in soup.find_all(["h1", "h2", "h3", "h4", "p", "li", "span"]):
-        text = element.get_text(strip=True)
-        if text:  # Avoid empty strings
-          extracted_texts.append(text)
+    # Extract text from main structural tags only (avoiding junk/spans)
+    extracted_texts = []
+    for element in soup.find_all(["h1", "h2", "h3", "h4", "p", "li"]):
+      text = element.get_text(strip=True)
+      if text:
+        extracted_texts.append(text)
 
-      # Save the extracted text to a file for the GenAI / RAG pipeline
-      output_filename = "Artificial_intelligence.txt"
-      with open(output_filename, "w", encoding="utf-8") as file:
-        file.write("\n".join(extracted_texts))
+    if not extracted_texts:
+      return {"success": False, "error": "No valid text content found."}
 
-      print(
-          f"Data successfully extracted and saved to '{output_filename}'! Total"
-          f" lines: {len(extracted_texts)}"
-      )
-    else:
-      print(f"Failed to fetch the website. Status code: {response.status_code}")
+    # Generate a clean filename from the website domain name
+    parsed_url = urlparse(target_url)
+    domain_name = parsed_url.netloc.replace(".", "_")
+    if not domain_name:
+      domain_name = "website_data"
+
+    # Ensure uploads directory exists
+    upload_dir = "uploads"
+    os.makedirs(upload_dir, exist_ok=True)
+
+    file_path = os.path.join(upload_dir, f"{domain_name}.txt")
+
+    # Save extracted text to file with UTF-8 encoding
+    with open(file_path, "w", encoding="utf-8") as file:
+      file.write("\n".join(extracted_texts))
+
+    return {"success": True, "filename": f"{domain_name}.txt", "path": file_path}
 
   except Exception as e:
-    print(f"An error occurred: {e}")
-
-
-# Run the scraper function
-scrape_website_data(url)
+    return {"success": False, "error": str(e)}
