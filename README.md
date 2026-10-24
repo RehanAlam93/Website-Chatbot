@@ -1,28 +1,35 @@
-#  Website RAG Chatbot with Flask & Groq AI
+# Chat with Any Website (RAG-based Web App)
 
-A fully functional, lightweight Retrieval-Augmented Generation (RAG) chatbot web application built using **Python (Flask)**, **BeautifulSoup** for web scraping, and **Groq AI** for lightning-fast LLM responses. This application allows users to scrape content from any website (such as Wikipedia) and chat intelligently with an AI assistant grounded in that specific context.
+A lightweight Flask web application that allows users to input any website URL, automatically extracts its textual content, saves it into an organized directory, and lets you chat intelligently with an AI assistant based strictly on that website's content.
 
----
+## 🚀 Features
 
-##  Features
-
-* **Dynamic Web Scraping:** Automatically extracts structured content (headings, paragraphs, lists) from target websites using BeautifulSoup.
-* **Context-Aware AI (RAG):** Feeds scraped website data into the system prompt so the LLM provides accurate answers specific to that source.
-* **Groq API Integration:** Leverages high-performance LLMs via Groq for instant, intelligent responses.
-* **Clean Web UI:** A modern, responsive chat interface (`templates/chatbot.html`) built with HTML/CSS/JavaScript.
-* **Token-Optimized:** Includes built-in safeguards to truncate long contexts and prevent rate-limit (TPM/413) errors.
+- **Dynamic URL Scraping:** Enter any standard website URL to scrape and extract its core structural content (headings, paragraphs, lists) while bypassing standard access blocks.
+- **Smart File Management:** Automatically cleans the website domain name (e.g., `en_wikipedia_org.txt`) and saves the extracted text inside an `uploads/` folder.
+- **Conditional Chat Interface:** The chat widget remains hidden until the website data is successfully loaded and validated.
+- **Context-Aware AI Assistant:** Powered by the **Groq API**, ensuring accurate responses grounded strictly in the scraped website text.
+- **Clean UI:** Built with an integrated, responsive floating chat interface using modern HTML, CSS, and JavaScript.
 
 ---
 
-##  Project Structure
+## 🛠️ Tech Stack
+
+- **Backend:** Python, Flask, Flask-CORS, python-dotenv
+- **Web Scraping:** BeautifulSoup4, Requests
+- **AI / LLM:** Groq API
+- **Frontend:** HTML5, CSS3, JavaScript (Fetch API)
+
+---
+
+## 📁 Project Structure
 
 ```text
-Website Chatbot/
-│                  # CSS and JavaScript files for frontend UI
-├── templates/               # HTML template files (chatbot.html)
-├── .env                     # Environment variables (Groq API Key)
-├── app.py                   # Main Flask backend server and chat endpoint
-├── extract_data.py          # Web scraping script to fetch and save website text
-├── Artificial_intelligence.txt # Scraped context data file
-├── requirements.txt         # Project dependencies
-└── README.md                # Project documentation
+website-chatbot/
+│
+├── uploads/              # Automatically stores scraped website .txt files
+├── templates/
+│   └── index.html        # Main frontend interface and integrated chat widget
+├── .env                  # Environment variables (Groq API Key)
+├── app.py                # Main Flask backend application and routes
+├── extract_data.py       # Scraping and text parsing logic
+└── requirements.txt      # Python dependencies
